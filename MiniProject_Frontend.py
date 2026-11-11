@@ -20,7 +20,10 @@ class Movie:
 		Duration=StringVar()
 		Rating=StringVar()
 
-		#Fuctions
+		#Functions
+		global sd
+		sd = ()
+
 		def iExit():
 			iExit=tkinter.messagebox.askyesno("Online Movie Ticket Booking System", "Are you sure???")
 			if iExit>0:
@@ -40,8 +43,9 @@ class Movie:
 		def adddata():
 			if(len(Movie_ID.get())!=0):
 				MiniProject_Backend.AddMovieRec(Movie_ID.get(),Movie_Name.get(),Release_Date.get(),Director.get(),Cast.get(),Budget.get(),Duration.get(),Rating.get())
-				MovieList.delete(0,END)
-				MovieList.insert(END,(Movie_ID.get(),Movie_Name.get(),Release_Date.get(),Director.get(),Cast.get(),Budget.get(),Duration.get(),Rating.get()))
+				disdata()
+			else:
+				tkinter.messagebox.showwarning("Online Movie Ticket Booking System", "Please enter at least a Movie ID!")
 
 		def disdata():
 			MovieList.delete(0,END)
@@ -50,6 +54,8 @@ class Movie:
 
 		def movierec(event):
 			global sd
+			if not MovieList.curselection():
+				return
 			searchmovie=MovieList.curselection()[0]
 			sd=MovieList.get(searchmovie)
 
@@ -71,10 +77,13 @@ class Movie:
 			self.txtRating.insert(END,sd[8])
 
 		def deldata():
-			if(len(Movie_ID.get())!=0):
+			global sd
+			if sd and len(Movie_ID.get())!=0:
 				MiniProject_Backend.DeleteMovieRec(sd[0])
 				clcdata()
 				disdata()
+			else:
+				tkinter.messagebox.showwarning("Online Movie Ticket Booking System", "Please select a movie record to delete!")
 
 		def searchdb():
 			MovieList.delete(0,END)
@@ -82,12 +91,12 @@ class Movie:
 				MovieList.insert(END, row, str(""))
 
 		def updata():
-			if(len(Movie_ID.get())!=0):
-				MiniProject_Backend.DeleteMovieRec(sd[0])
-			if(len(Movie_ID.get())!=0):
-				MiniProject_Backend.AddMovieRec(Movie_ID.get(),Movie_Name.get(),Release_Date.get(),Director.get(),Cast.get(),Budget.get(),Duration.get(),Rating.get())
-				MovieList.delete(0,END)
-				MovieList.insert(END,(Movie_ID.get(),Movie_Name.get(),Release_Date.get(),Director.get(),Cast.get(),Budget.get(),Duration.get(),Rating.get()))
+			global sd
+			if sd and len(Movie_ID.get())!=0:
+				MiniProject_Backend.UpdateMovieData(sd[0],Movie_ID.get(),Movie_Name.get(),Release_Date.get(),Director.get(),Cast.get(),Budget.get(),Duration.get(),Rating.get())
+				disdata()
+			else:
+				tkinter.messagebox.showwarning("Online Movie Ticket Booking System", "Please select a movie record to update!")
 
 		#Frames
 		MainFrame=Frame(self.root, bg="black")
@@ -183,6 +192,8 @@ class Movie:
 
 		self.btnx=Button(BFrame, text="Exit", font=('Arial', 20, 'bold'), width=10, height=1, bd=4, bg="orange", command=iExit)
 		self.btnx.grid(row=0, column=6)
+
+		disdata()
 
 
 if __name__=='__main__':
